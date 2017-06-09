@@ -1,8 +1,8 @@
-/*
+<?php/*
   * SINGULAR TEMPLATE for Bootstrap 4 Wordpress Parent Theme by Michael Ahlstrom
   *
 */
-
+?>
 <?php get_header(); ?>
 
 <?php // the lOOP: https://codex.wordpress.org/The_Loop ?>
