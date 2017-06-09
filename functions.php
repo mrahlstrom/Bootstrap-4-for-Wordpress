@@ -1,34 +1,31 @@
-<?php
-/*FUNCTIONS.PHP for Bootstrap 4 for Wordpress Theme  by Michael Ahlstrom */
+<?php /*
+  * FUNCTIONS.PHP for Bootstrap 4 for Wordpress Theme
+  */
 /*  REGISTER AND ENQUEUE */
-function enqueue_bootstrap_express_scripts_and_styles(){
-    wp_enqueue_style('bootstrap-css', get_template_directory_uri() . "/css/bootstrap.min.css", false, NULL, 'all');
-    //wp_enqueue_style('bootstrap-theme-css', get_template_directory_uri(). "/css/bootstrap-theme.min.css", false, NULL, 'all'); //  BOOTSTRAP THEME is optional addition to main bootstrap css
-    wp_enqueue_style( 'style', get_stylesheet_uri(), false, NULL, 'all');
+add_action( 'wp_enqueue_scripts', 'enqueue_bootstrap_theme_scripts_and_styles' );
+function enqueue_bootstrap_theme_scripts_and_styles(){
+    wp_enqueue_style('bootstrap-css', "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css", false, NULL, 'all');
+    wp_enqueue_style('font-awesome-css',"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", false, NULL, 'all');
+    wp_enqueue_style( 'theme-style', get_template_directory_uri(). '/style.css', array('bootstrap-css'), NULL, 'all');
+    // BOOTSTRAP THEME is an optional additional stylesheet
+    //wp_enqueue_style('bootstrap-theme-css', get_template_directory_uri(). "/css/bootstrap-theme.min.css", false, NULL, 'all');
 
-    wp_register_script('bootstrap-js', get_template_directory_uri() . "/js/bootstrap.min.js", Array('jquery'), false, true);
-    wp_enqueue_script('bootstrap-js');
+
+
+    /*  REGISTER AND ENQUEUE BOOTSTRAP JS FOR DEPENDENCIES */
+    wp_deregister_script('jquery');
+    wp_register_script('jquery', "https://code.jquery.com/jquery-3.1.1.slim.min.js", Array(), NULL, true);
+    wp_register_script('tether-js', "https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js", Array('jquery'), NULL, true);
+    wp_register_script('bootstrap-js', "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js", Array('jquery', 'tether-js'), NULL, true);
+    wp_enqueue_script('bootstrap-js',get_stylesheet_uri() . "/js/theme.js",Array('jquery','bootstrap-js','tether-js'),NULL, true);
+
+    // not sure what should go in the theme js file (if anything).  bootstrap provides most required js
+    //wp_register_script('theme-js', "");
 }
-add_action( 'wp_enqueue_scripts', 'enqueue_bootstrap_express_scripts_and_styles' );
-
-/*  THEME SUPPORT FOR TITLE TAG  */
-add_theme_support( 'title-tag' );
-
-/*  REMOVE FROM HEADER  */
-remove_action('wp_head', 'rsd_link');
-remove_action('wp_head', 'wp_generator');
-remove_action('wp_head', 'feed_links', 2);
-remove_action('wp_head', 'index_rel_link');
-remove_action('wp_head', 'wlwmanifest_link');
-remove_action('wp_head', 'feed_links_extra', 3);
-remove_action('wp_head', 'start_post_rel_link', 10, 0);
-remove_action('wp_head', 'parent_post_rel_link', 10, 0);
-remove_action('wp_head', 'adjacent_posts_rel_link', 10, 0);
 
 /*  ADD FUNCTION WP_BOOTSTRAP_NAVBAR_MENU  */
 /*  MENU ITEM CLASSES WALKER  */
-// this is a taken from Wordpress 4.7.5 and modified
-// adds 'nav-item' to list item, adds 'nav-link' to link to make it conform with bootstrap css
+// adds 'nav-item' to list item, adds 'nav-link' to link
 class Bootstrap_Navbar_Menu_Walker extends Walker_Nav_Menu {
 	public function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
 		if ( isset( $args->item_spacing ) && 'discard' === $args->item_spacing ) {
@@ -149,13 +146,14 @@ class Bootstrap_Navbar_Menu_Walker extends Walker_Nav_Menu {
 
 }
 
-// custom function to create bootstrap-type navbar menus from wordpress menus
-// use &args to pass variables through the function to basic wp_nav_menu function
+
+
 function wp_bootstrap_navbar_menu($args){
   $args['menu_class'] = 'menu navbar-nav';
   $args['container'] = 'ul';
 	$args['walker'] =  new Bootstrap_Navbar_Menu_Walker();
   wp_nav_menu($args);
 }
+
 
 ?>
