@@ -7,19 +7,13 @@ function enqueue_bootstrap_theme_scripts_and_styles(){
     wp_enqueue_style('bootstrap-css', "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css", false, NULL, 'all');
     wp_enqueue_style('font-awesome-css',"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", false, NULL, 'all');
     wp_enqueue_style( 'theme-style', get_template_directory_uri(). '/style.css', array('bootstrap-css'), NULL, 'all');
-    // BOOTSTRAP THEME is an optional additional stylesheet
-    //wp_enqueue_style('bootstrap-theme-css', get_template_directory_uri(). "/css/bootstrap-theme.min.css", false, NULL, 'all');
-
-
-
-
 
     /*  REGISTER AND ENQUEUE BOOTSTRAP JS FOR DEPENDENCIES */
     wp_deregister_script('jquery');
     wp_enqueue_script('modernizr_custom',get_template_directory_uri() . "/js/modernizr.js", array(),null, false);
     wp_register_script('jquery', "https://code.jquery.com/jquery-3.1.1.slim.min.js", Array(), NULL, true);
     wp_register_script('tether-js', "https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js", Array('jquery'), NULL, true);
-    wp_enqueue_script('custom_jquery_mobile',get_template_directory_uri() . "/js/jquery.mobile.custom.min.js",array('jquery'), null, true);
+    //wp_enqueue_script('custom_jquery_mobile',get_template_directory_uri() . "/js/jquery.mobile.custom.min.js",array('jquery'), null, true);
     wp_register_script('bootstrap-js', "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js", Array('jquery', 'tether-js'), NULL, true);
     wp_enqueue_script('bootstrap-js',get_stylesheet_uri() . "/js/theme.js",Array('jquery','bootstrap-js','tether-js'),NULL, true);
 
@@ -31,7 +25,20 @@ function enqueue_bootstrap_theme_scripts_and_styles(){
 /*  MENU ITEM CLASSES WALKER  */
 // adds 'nav-item' to list item, adds 'nav-link' to link
 class Bootstrap_Navbar_Menu_Walker extends Walker_Nav_Menu {
-	public function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
+
+  public function start_lvl( &$output, $depth = 0, $args = array() ) {
+    if ( isset( $args->item_spacing ) && 'discard' === $args->item_spacing ) {
+      $t = '';
+      $n = '';
+    } else {
+      $t = "\t";
+      $n = "\n";
+    }
+    $indent = str_repeat( $t, $depth );
+    $output .= "{$n}{$indent}<ul class=\"sub-menu\">{$n}";
+  }
+
+  public function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
 		if ( isset( $args->item_spacing ) && 'discard' === $args->item_spacing ) {
 						$t = '';
 						$n = '';
@@ -42,6 +49,8 @@ class Bootstrap_Navbar_Menu_Walker extends Walker_Nav_Menu {
 		$indent = ( $depth ) ? str_repeat( $t, $depth ) : '';
 		$classes = empty( $item->classes ) ? array() : (array) $item->classes;
 		$classes[] = 'menu-item-' . $item->ID;
+
+// -->  CUSTOM EDITS HERE
     if(in_array("current-menu-item",$classes)) $classes[] = 'active';
 
 		/**
@@ -154,7 +163,7 @@ class Bootstrap_Navbar_Menu_Walker extends Walker_Nav_Menu {
 
 function wp_bootstrap_navbar_menu($args){
   $args['menu_class'] = 'menu navbar-nav';
-  $args['container'] = 'ul';
+  $args['container'] = 'div';
 	$args['walker'] =  new Bootstrap_Navbar_Menu_Walker();
   wp_nav_menu($args);
 }

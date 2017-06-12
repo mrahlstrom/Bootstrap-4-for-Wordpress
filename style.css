@@ -11,3 +11,6 @@ Tags: Bootstrap, parent-only
 
 Use it to make something cool, have fun, and share what you've learned with others.
 */
+.sub-menu {
+  list-style-type: none;
+}
